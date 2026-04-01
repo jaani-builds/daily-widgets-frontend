@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Simple Daily Widgets</title>
+    <meta
+      name="description"
+      content="Dashboard for time, weather, and exchange rates powered by the daily-widgets-backend endpoints."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles/main.css" />
+  </head>
+  <body>
+    <div class="ambient ambient-a" aria-hidden="true"></div>
+    <div class="ambient ambient-b" aria-hidden="true"></div>
+
+    <main class="app-shell">
+      <header class="page-title reveal">
+        <div class="page-title-row">
+          <h1>Simple Daily Widgets</h1>
+          <span id="api-mode-badge" class="mode-badge">Mode: --</span>
+        </div>
+      </header>
+
+      <section class="grid">
+        <article class="panel reveal feature-card combined-panel">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">Location</p>
+              <h2>Local weather and time</h2>
+            </div>
+          </div>
+
+          <form id="weather-form" class="inline-form" autocomplete="off">
+            <input id="weather-city" name="city" type="text" placeholder="Enter city" required />
+            <button id="weather-submit" type="submit">Get weather</button>
+          </form>
+
+          <div id="weather-result" class="result-card empty">Detecting your current location weather...</div>
+        </article>
+      </section>
+
+      <section class="panel reveal feature-card fx-panel">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">Exchange Rates</p>
+            <h2>Spot rate and historical trend</h2>
+          </div>
+          <span class="endpoint-pill">/exchange-rates</span>
+        </div>
+
+        <form id="fx-form" class="fx-form" autocomplete="off">
+          <div>
+            <label for="fx-base">Base currency</label>
+            <input id="fx-base" name="base" value="SGD" maxlength="3" required />
+          </div>
+          <div>
+            <label for="fx-target">Target currency</label>
+            <input id="fx-target" name="target" value="INR" maxlength="3" required />
+          </div>
+          <div>
+            <label for="fx-period-value">History length</label>
+            <input id="fx-period-value" name="periodValue" type="number" value="1" min="1" max="365" required />
+          </div>
+          <div>
+            <label for="fx-period-unit">Period unit</label>
+            <select id="fx-period-unit" name="periodUnit">
+              <option value="days">Days</option>
+              <option value="months" selected>Months</option>
+              <option value="years">Years</option>
+            </select>
+          </div>
+          <button id="fx-submit" type="submit">Load rates</button>
+        </form>
+
+        <div class="chart-card">
+          <canvas id="fx-chart" aria-label="Exchange rate history chart"></canvas>
+          <div id="fx-tooltip" class="chart-tooltip" hidden></div>
+          <div id="fx-summary" class="chart-summary muted mono">Load a currency pair to render the historical chart.</div>
+        </div>
+
+      </section>
+
+      <p id="status" class="status" role="status" aria-live="polite">Ready.</p>
+    </main>
+
+    <script type="module" src="./src/main.js"></script>
+  </body>
+</html>
