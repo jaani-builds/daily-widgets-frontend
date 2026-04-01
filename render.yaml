@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: daily-widgets-frontend
+    env: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    healthCheckPath: /
