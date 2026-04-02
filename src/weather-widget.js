@@ -2,7 +2,7 @@ import { formatDateLabel, formatLocalTime, formatNowInTimeZone, formatNumber, no
 
 const DEFAULT_CITY = "London";
 
-export function createWeatherWidget({ getJson, getJsonFromUrl, setStatus }) {
+export function createWeatherWidget({ getJson, getJsonFromUrl, setStatus, onLocationResolved }) {
   const weatherResultEl = document.querySelector("#weather-result");
   const trendStates = {
     localUsd: { canvas: null, valueEl: null, directionEl: null, forecastEl: null, tooltipEl: null, points: [], coordinates: [], hoveredIndex: null },
@@ -32,39 +32,6 @@ export function createWeatherWidget({ getJson, getJsonFromUrl, setStatus }) {
     trendStates.localEur.forecastEl = document.querySelector("#trend-local-eur-forecast");
     trendStates.localEur.canvas = document.querySelector("#trend-local-eur-chart");
     trendStates.localEur.tooltipEl = document.querySelector("#trend-local-eur-tooltip");
-  }
-
-  function renderNewsList(items) {
-    const newsListEl = document.querySelector("#weather-news-list");
-    if (!newsListEl) {
-      return;
-    }
-    if (!items.length) {
-      newsListEl.innerHTML = '<li class="muted">No recent local headlines available right now.</li>';
-      return;
-    }
-    newsListEl.innerHTML = items
-      .map((item) => {
-        const title = item.title || "Untitled";
-        const url = item.url || "#";
-        const source = item.source || "News";
-        return `<li><a href="${url}" target="_blank" rel="noopener noreferrer">${title}</a> <span class="muted mono">(${source})</span></li>`;
-      })
-      .join("");
-  }
-
-  async function loadLocationNews(city, country) {
-    try {
-      const payload = await getJson("/news", { city, country, limit: 10 });
-      const articles = (payload.articles || []).slice(0, 10).map((article) => ({
-        title: article.title,
-        url: article.url,
-        source: article.source || "News",
-      }));
-      renderNewsList(articles);
-    } catch {
-      renderNewsList([]);
-    }
   }
 
   async function getCurrentPosition() {
@@ -340,7 +307,6 @@ export function createWeatherWidget({ getJson, getJsonFromUrl, setStatus }) {
           <article class="trend-card"><h3><span>${trendCurrency} to USD (Last 1 Month)</span><span class="${trendBadgeClass}">${trendBadgeLabel}</span></h3><p id="trend-local-usd-value" class="trend-value mono">-</p><p id="trend-local-usd-direction" class="muted mono">Trend: -</p><p id="trend-local-usd-forecast" class="muted mono">Forecast (1-4d): -</p>${trendSupportNote}<canvas id="trend-local-usd-chart" aria-label="Local currency to USD one month trend"></canvas><div id="trend-local-usd-tooltip" class="chart-tooltip trend-tooltip" hidden></div></article>
           <article class="trend-card"><h3><span>${trendCurrency} to EUR (Last 1 Month)</span><span class="${trendBadgeClass}">${trendBadgeLabel}</span></h3><p id="trend-local-eur-value" class="trend-value mono">-</p><p id="trend-local-eur-direction" class="muted mono">Trend: -</p><p id="trend-local-eur-forecast" class="muted mono">Forecast (1-4d): -</p>${trendSupportNote}<canvas id="trend-local-eur-chart" aria-label="Local currency to EUR one month trend"></canvas><div id="trend-local-eur-tooltip" class="chart-tooltip trend-tooltip" hidden></div></article>
         </div>
-        <article class="weather-wide-card"><h3 class="weather-section-title">Top 10 News for ${cityLabel}</h3><ol id="weather-news-list" class="weather-news-list mono"><li class="muted">Loading local headlines...</li></ol></article>
       </div>
     `;
 
@@ -348,7 +314,11 @@ export function createWeatherWidget({ getJson, getJsonFromUrl, setStatus }) {
     attachTrendHover(trendStates.localUsd);
     attachTrendHover(trendStates.localEur);
     loadSplitTrends(trendCurrency);
-    loadLocationNews(payload.city, payload.country);
+    if (typeof onLocationResolved === "function") {
+      Promise.resolve(onLocationResolved({ city: payload.city, country: payload.country })).catch(() => {
+        // Keep weather rendering resilient if downstream news loading fails.
+      });
+    }
     startLocationClock(timezoneValue, timezoneLabel, cityLabel, localTime);
   }
 

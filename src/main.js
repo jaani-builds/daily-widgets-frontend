@@ -1,5 +1,6 @@
 import { API_CONFIG, getJson, getJsonFromUrl } from "./api.js";
 import { createFxWidget } from "./fx-widget.js";
+import { createNewsWidget } from "./news-widget.js";
 import { setButtonBusy } from "./utils.js";
 import { createWeatherWidget } from "./weather-widget.js";
 
@@ -27,7 +28,16 @@ function renderApiModeBadge() {
 }
 
 const fxWidget = createFxWidget({ getJson, setStatus });
-const weatherWidget = createWeatherWidget({ getJson, getJsonFromUrl, setStatus });
+const newsWidget = createNewsWidget({ getJson, setStatus });
+const weatherWidget = createWeatherWidget({
+  getJson,
+  getJsonFromUrl,
+  setStatus,
+  onLocationResolved: ({ city, country }) => {
+    // setLocationFromWeather already calls loadNews internally
+    newsWidget.setLocationFromWeather({ city, country });
+  },
+});
 
 function wireEvents() {
   const refreshButton = document.querySelector("#refresh-time");

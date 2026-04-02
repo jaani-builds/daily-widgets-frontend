@@ -28,63 +28,95 @@
         </div>
       </header>
 
-      <section class="grid">
-        <article class="panel reveal feature-card combined-panel">
+      <section class="dashboard-layout">
+        <div class="dashboard-main">
+          <section class="grid">
+            <article class="panel reveal feature-card combined-panel">
+              <div class="panel-heading">
+                <div>
+                  <p class="eyebrow">Location</p>
+                  <h2>Local weather and time</h2>
+                </div>
+              </div>
+
+              <form id="weather-form" class="inline-form" autocomplete="off">
+                <input id="weather-city" name="city" type="text" placeholder="Enter city" required />
+                <button id="weather-submit" type="submit">Get weather</button>
+              </form>
+
+              <div id="weather-result" class="result-card empty">Detecting your current location weather...</div>
+            </article>
+          </section>
+
+          <section class="panel reveal feature-card fx-panel">
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">Exchange Rates</p>
+                <h2>Spot rate and historical trend</h2>
+              </div>
+              <span class="endpoint-pill">/exchange-rates</span>
+            </div>
+
+            <form id="fx-form" class="fx-form" autocomplete="off">
+              <div>
+                <label for="fx-base">Base currency</label>
+                <input id="fx-base" name="base" value="SGD" maxlength="3" required />
+              </div>
+              <div>
+                <label for="fx-target">Target currency</label>
+                <input id="fx-target" name="target" value="INR" maxlength="3" required />
+              </div>
+              <div>
+                <label for="fx-period-value">History length</label>
+                <input id="fx-period-value" name="periodValue" type="number" value="1" min="1" max="365" required />
+              </div>
+              <div>
+                <label for="fx-period-unit">Period unit</label>
+                <select id="fx-period-unit" name="periodUnit">
+                  <option value="days">Days</option>
+                  <option value="months" selected>Months</option>
+                  <option value="years">Years</option>
+                </select>
+              </div>
+              <button id="fx-submit" type="submit">Load rates</button>
+            </form>
+
+            <div class="chart-card">
+              <canvas id="fx-chart" aria-label="Exchange rate history chart"></canvas>
+              <div id="fx-tooltip" class="chart-tooltip" hidden></div>
+              <div id="fx-summary" class="chart-summary muted mono">Load a currency pair to render the historical chart.</div>
+            </div>
+          </section>
+        </div>
+
+        <aside class="panel reveal feature-card news-side-panel">
           <div class="panel-heading">
             <div>
-              <p class="eyebrow">Location</p>
-              <h2>Local weather and time</h2>
+              <p class="eyebrow">News</p>
+              <h2>Latest headlines by location</h2>
             </div>
+            <span class="endpoint-pill">/news</span>
           </div>
-
-          <form id="weather-form" class="inline-form" autocomplete="off">
-            <input id="weather-city" name="city" type="text" placeholder="Enter city" required />
-            <button id="weather-submit" type="submit">Get weather</button>
+          <form id="news-form" class="news-form" autocomplete="off" style="display: none;">
+            <div>
+              <label for="news-city">City</label>
+              <input id="news-city" name="city" type="text" placeholder="Dublin" />
+            </div>
+            <div>
+              <label for="news-state">State / Region</label>
+              <input id="news-state" name="state" type="text" placeholder="California" />
+            </div>
+            <div>
+              <label for="news-country">Country</label>
+              <input id="news-country" name="country" type="text" placeholder="Ireland" />
+            </div>
+            <button id="news-submit" type="submit">Load news</button>
           </form>
-
-          <div id="weather-result" class="result-card empty">Detecting your current location weather...</div>
-        </article>
-      </section>
-
-      <section class="panel reveal feature-card fx-panel">
-        <div class="panel-heading">
-          <div>
-            <p class="eyebrow">Exchange Rates</p>
-            <h2>Spot rate and historical trend</h2>
-          </div>
-          <span class="endpoint-pill">/exchange-rates</span>
-        </div>
-
-        <form id="fx-form" class="fx-form" autocomplete="off">
-          <div>
-            <label for="fx-base">Base currency</label>
-            <input id="fx-base" name="base" value="SGD" maxlength="3" required />
-          </div>
-          <div>
-            <label for="fx-target">Target currency</label>
-            <input id="fx-target" name="target" value="INR" maxlength="3" required />
-          </div>
-          <div>
-            <label for="fx-period-value">History length</label>
-            <input id="fx-period-value" name="periodValue" type="number" value="1" min="1" max="365" required />
-          </div>
-          <div>
-            <label for="fx-period-unit">Period unit</label>
-            <select id="fx-period-unit" name="periodUnit">
-              <option value="days">Days</option>
-              <option value="months" selected>Months</option>
-              <option value="years">Years</option>
-            </select>
-          </div>
-          <button id="fx-submit" type="submit">Load rates</button>
-        </form>
-
-        <div class="chart-card">
-          <canvas id="fx-chart" aria-label="Exchange rate history chart"></canvas>
-          <div id="fx-tooltip" class="chart-tooltip" hidden></div>
-          <div id="fx-summary" class="chart-summary muted mono">Load a currency pair to render the historical chart.</div>
-        </div>
-
+          <p id="news-context" class="muted mono">Loading news for your location...</p>
+          <ol id="news-list" class="weather-news-list mono">
+            <li class="muted">Waiting for location data from weather module...</li>
+          </ol>
+        </aside>
       </section>
 
       <p id="status" class="status" role="status" aria-live="polite">Ready.</p>
